@@ -37,7 +37,7 @@
 
 
 clc, clear, close all
-cross_correlated = false;
+cross_correlated = true;
 saveResults = true;
 
 addpath('../utils/');
@@ -112,11 +112,16 @@ figure;
 histogram(trend_durSL_fig,30);
 xlabel('normalized trend duration [s]');
 ylabel('pdf');
-title(strcat(ver,' surrogates ST'));
+title(strcat('ST',{' '},ver,' surrogates'));
+grid on;
+set(gca,'FontWeight','bold','FontSize', 13);
+set(gcf, 'PaperPositionMode', 'auto'); 
 
 figure;
 histogram(trend_durST_fig,30);
 xlabel('normalized trend duration [s]');
 ylabel('pdf');
-title(strcat(ver,' surrogates SL'));
-
+title(strcat('SL',{' '},ver,' surrogates'));
+grid on;
+set(gca,'FontWeight','bold','FontSize', 13);
+set(gcf, 'PaperPositionMode', 'auto');

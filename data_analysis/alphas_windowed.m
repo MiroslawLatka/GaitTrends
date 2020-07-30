@@ -39,7 +39,7 @@
 
 clc, clear, close all
 % SPD: 1 - 100, 2 - 110, 3 - 90, 4 - 120, 5 - 80 [%PWS]
-fileName = 'dingwell_alphas_windowed_Ln_SPD1.mat';
+fileName = 'dingwell_alphas_windowed_SL_SPD1.mat';
 % fileName = 'fbm_0.4_alphas_windowed.mat';
 % fileName = 'fbm_0.75_alphas_windowed.mat';
 
@@ -70,5 +70,10 @@ for col = 1 : 4 % 1 - alpha1, 2 - alpha2, 3 - alpha3, 4 - alphaMD
 	title(labels{col});
 	xlabel('window length');
 	ylabel('scaling exponent');
+    set(gca,'FontWeight','bold','FontSize', 13);
+    grid on;
+    set(gcf, 'PaperPositionMode', 'auto');
+    set(findobj(gca,'type','line'),'linew',1.5);
+    hold off; 
 
 end

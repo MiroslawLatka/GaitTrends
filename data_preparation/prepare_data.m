@@ -53,11 +53,11 @@ fileList = fileList(~[fileList.isdir]);
 
 switch attributeNumber
     case 1
-        param = 'Ln';
+        param = 'SL';
     case 2
-        param = 'Tn';
+        param = 'ST';
     case 3
-        param = 'Sn';
+        param = 'SS';
     otherwise
         error('Error. attributeNumber must an integer between 1 and 3.')
 end
@@ -159,6 +159,7 @@ for i = 1 : length(fileList)
 			plot(X,predY,'r','LineWidth',2); 
 			plot(X(knotIndices), predY(knotIndices),'go',...
                 'MarkerSize',8,'LineWidth',2);
+            legend(param,strcat(param,' trend'),'knot');
 			title(plotTitle,'FontSize', 20);
 			xlim([min(X) max(X)]);
 			xlabel('time [s]','FontSize', 18);
@@ -228,6 +229,7 @@ for i = 1 : length(fileList)
 			plot(X,predY,'r','LineWidth',2); 
 			plot(X(knotIndices), predY(knotIndices),'go',...
                 'MarkerSize',8,'LineWidth',2);
+            legend(param,strcat(param,' trend'),'knot');
 			title(plotTitle,'FontSize', 20);
 			xlim([min(X) max(X)]);
 			xlabel('time [s]','FontSize', 18);
@@ -236,7 +238,7 @@ for i = 1 : length(fileList)
 			set(gca,'FontWeight','bold','FontSize', 13);
 			set(gcf, 'PaperPositionMode', 'auto');
 			hold off;    
-         end  
+        end  
 
 	end
 

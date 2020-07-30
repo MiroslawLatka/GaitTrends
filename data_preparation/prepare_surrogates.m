@@ -1,7 +1,6 @@
-
 % =========================================================================
 % This script loads gait data from Dingwell’s MAT-files and calculates 
-% phase-randomized surrogate data using TISEAN library. Then it finds 
+% phase-randomized surrogates using TISEAN library. Then it finds 
 % piecewise linear MARS trends in surrogate time series.
 % Before running the script,  please set:
 %       1) speed (SPD)
@@ -58,9 +57,9 @@ currentPath = pwd;
 addpath('../libs/');
 addpath('../data/mat_data/');
 % load SL data
-SLdata = load(strcat('Ln_SPD',num2str(SPD),'.mat'));
+SLdata = load(strcat('SL_SPD',num2str(SPD),'.mat'));
 % load ST data
-STdata = load(strcat('Tn_SPD',num2str(SPD),'.mat'));
+STdata = load(strcat('ST_SPD',num2str(SPD),'.mat'));
 
 s = size(SLdata.residualsAll);
 surrogatesSL = {};
@@ -96,11 +95,11 @@ for i = 1 : s(2)
 		
 		tot = [orgSL  orgST]; 
         inFile = strcat(pwd, '\in.txt');
-        save(inFile,'tot','-ascii')
+        save(inFile,'tot','-ascii');
         cmd = strcat('surrogates.exe -o',{' '},pwd, ...
-            '\out.txt -m 2 -I',{' '},num2str(seed(1)),{' '},pwd,'\in.txt')
+            '\out.txt -m 2 -I',{' '},num2str(seed(1)),{' '},pwd,'\in.txt');
         cd('../libs/');
-        system(cmd{1})
+        system(cmd{1});
         cd(currentPath)
 		surrogatesTot = load('out.txt');
  
@@ -115,21 +114,21 @@ for i = 1 : s(2)
 		str = 'independent_surrogates';       
         
 		inFile = strcat(pwd, '\in.txt');
-        save(inFile,'orgSL','-ascii')
+        save(inFile,'orgSL','-ascii');
         cmd = strcat('surrogates.exe -o',{' '},pwd, ...
-            '\out.txt -I',{' '},num2str(seed(1)),{' '},pwd,'\in.txt')
+            '\out.txt -I',{' '},num2str(seed(1)),{' '},pwd,'\in.txt');
         cd('../libs/');
-        system(cmd{1})
+        system(cmd{1});
         cd(currentPath)
 		surSL = load('out.txt'); 
 		surrogatesSL{end+1} = surSL;
 		
 		inFile = strcat(pwd, '\in.txt');
-        save(inFile,'orgST','-ascii')
+        save(inFile,'orgST','-ascii');
         cmd = strcat('surrogates.exe -o',{' '},pwd, ...
-            '\out.txt -I',{' '},num2str(seed(2)),{' '},pwd,'\in.txt')
+            '\out.txt -I',{' '},num2str(seed(2)),{' '},pwd,'\in.txt');
         cd('../libs/');
-        system(cmd{1})
+        system(cmd{1});
         cd(currentPath)
 		surST = load('out.txt');
 		surrogatesST{end+1} = surST;
@@ -220,11 +219,25 @@ for i = 1 : s(2)
 
     if(generateFigures)
 		figure;
-		plot(surSL,'b--'); hold on;
-		plot(surST,'r--');
-		plot(predSL,'b');
-		plot(predST,'r'); hold off;
-		title('surrogate data');      
+		plot(surSL,'b--','LineWidth',1); hold on;
+		plot(surST,'r--','LineWidth',1);
+		plot(predSL,'b','LineWidth',1.5);
+		plot(predST,'r','LineWidth',1.5);
+        xlim([0 length(surSL)]);
+        plot(knotIndicesSL{end}, ...
+            surrogatesSL_trends{end}(knotIndicesSL{end}),'go',...
+                'MarkerSize',8,'LineWidth',2);
+        plot(knotIndicesST{end}, ...
+            surrogatesST_trends{end}(knotIndicesST{end}),'gd',...
+                'MarkerSize',8,'LineWidth',2);
+		title('surrogate data'); 
+        legend('SL surrogate', 'ST surrogate', 'SL trend', ...
+            'ST trend','SL knot', 'ST knot');      
+		xlabel('time [s]','FontSize', 18);
+		grid on;
+		set(gca,'FontWeight','bold','FontSize', 13);
+		set(gcf, 'PaperPositionMode', 'auto');
+		hold off;    
     end
   
 end

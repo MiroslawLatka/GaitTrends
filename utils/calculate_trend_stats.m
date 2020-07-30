@@ -112,7 +112,7 @@ for j = 1 : trialSize(2)
 
                for l = 1 : length(locs)  
 
-                   timeFragment = timeSeries(knotInd(locs(l)):knotInd(locs(l)+1));
+                   timeFragment = timeStamps(knotInd(locs(l)):knotInd(locs(l)+1));
                    seriesFragment = series(knotInd(locs(l)):knotInd(locs(l)+1));
 
                end

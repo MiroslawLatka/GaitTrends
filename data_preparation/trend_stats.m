@@ -53,14 +53,14 @@ end
 
 switch attributeNumber
     case 1
-        fileNamesCell = {'Ln_SPD1.mat','Ln_SPD2.mat',...
-        'Ln_SPD3.mat','Ln_SPD4.mat',...
-        'Ln_SPD5.mat'};
+        fileNamesCell = {'SL_SPD1.mat','SL_SPD2.mat',...
+        'SL_SPD3.mat','SL_SPD4.mat',...
+        'SL_SPD5.mat'};
         param = 'SL';
     case 2
-        fileNamesCell = {'Tn_SPD1.mat','Tn_SPD2.mat',...
-        'Tn_SPD3.mat','Tn_SPD4.mat',...
-        'Tn_SPD5.mat'};
+        fileNamesCell = {'ST_SPD1.mat','ST_SPD2.mat',...
+        'ST_SPD3.mat','ST_SPD4.mat',...
+        'ST_SPD5.mat'};
         param = 'ST';
     otherwise
         error('Error. Attribute must be a value between 1 and 2.')
@@ -113,11 +113,17 @@ histogram(trend_durations_fig,30,'Normalization','pdf');
 xlabel('normalized trend duration [s]');
 ylabel('pdf');
 title(strcat(param,' trends'));
+grid on;
+set(gca,'FontWeight','bold','FontSize', 13);
+set(gcf, 'PaperPositionMode', 'auto'); 
 
 figure;
 histogram(long_slopes_fig,30,'Normalization','pdf');
 xlabel('normalized slope');
 ylabel('pdf');
 title(strcat(param,' long trends'));
+grid on;
+set(gca,'FontWeight','bold','FontSize', 13);
+set(gcf, 'PaperPositionMode', 'auto'); 
 
 

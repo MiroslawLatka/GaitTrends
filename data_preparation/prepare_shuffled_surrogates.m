@@ -4,14 +4,14 @@
 % piecewise linear MARS trends in surrogate time series.
 % Before running the script,  please set:
 %       1) speed (SPD)
-%       2) random number generator seeds.
+%       2) random number generator seed.
 % By default the variable generateFigures is set to true 
 % so that the surrogate time series for ST and SL and their trends 
 % are plotted for all subjects. 
 % Please ensure that you have added ARESLab folder (in libs/ folder) 
 % to the MATLAB search path. 
 % =========================================================================
-
+%
 % GaitTrends: 
 % Authors: Klaudia Kozlowska (Klaudia.Kozlowska@pwr.edu.pl)
 %          Miroslaw Latka    (Miroslaw.Latka@pwr.edu.pl)
@@ -42,8 +42,8 @@
 clc, clear, close all
 
 SPD = 1; % 1 - 100, 2 - 110, 3 - 90, 4 - 120, 5 - 80 [%PWS]
-seed=456
-rng(seed)
+seed = 456;
+rng(seed);
 generateFigures  = true;
 
 if(SPD < 1 || SPD > 5)
@@ -52,9 +52,9 @@ end
 
 addpath('../data/mat_data/');
 % load SL data
-SLdata = load(strcat('Ln_SPD',num2str(SPD),'.mat'));
+SLdata = load(strcat('SL_SPD',num2str(SPD),'.mat'));
 % load ST data
-STdata = load(strcat('Tn_SPD',num2str(SPD),'.mat'));
+STdata = load(strcat('ST_SPD',num2str(SPD),'.mat'));
 
 s = size(SLdata.residualsAll);
 surrogatesSL = {};
@@ -176,11 +176,25 @@ for i = 1 : s(2)
 		
 		if(generateFigures)
 			figure;
-			plot(surSL,'b--'); hold on;
-			plot(surST,'r--');
-			plot(predSL,'b');
-			plot(predST,'r'); hold off;
-			title('surrogate data');  		
+            plot(surSL,'b--','LineWidth',1); hold on;
+            plot(surST,'r--','LineWidth',1);
+            plot(predSL,'b','LineWidth',1.5);
+            plot(predST,'r','LineWidth',1.5);
+            xlim([0 length(surSL)]);
+            plot(knotIndicesSL{end}, ...
+                surrogatesSL_trends{end}(knotIndicesSL{end}),'go',...
+                'MarkerSize',8,'LineWidth',2);
+            plot(knotIndicesST{end}, ...
+                surrogatesST_trends{end}(knotIndicesST{end}),'gd',...
+                'MarkerSize',8,'LineWidth',2);
+			title('surrogate data');
+            legend('SL surrogate', 'ST surrogate', 'SL trend', ...
+            'ST trend','SL knot', 'ST knot');      
+            xlabel('time [s]','FontSize', 18);
+            grid on;
+            set(gca,'FontWeight','bold','FontSize', 13);
+            set(gcf, 'PaperPositionMode', 'auto');
+            hold off; 
 		end
   
 end

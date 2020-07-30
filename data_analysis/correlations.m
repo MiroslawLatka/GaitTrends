@@ -35,9 +35,9 @@ corr_cell = {};
 for i = 1 : 5
     
 	% load SL data
-	SLdata = load(strcat('Ln_SPD',num2str(i),'.mat'));
+	SLdata = load(strcat('SL_SPD',num2str(i),'.mat'));
 	% load ST data
-	STdata = load(strcat('Tn_SPD',num2str(i),'.mat'));
+	STdata = load(strcat('ST_SPD',num2str(i),'.mat'));
 		
 	trialSize = size(SLdata.residualsAll);
 	corrMatrix = [];
@@ -78,6 +78,7 @@ end % end speed loop
 
 % visualize results for trends
 ind = [5, 3, 1, 2, 4];
+speeds = {'80','90','100','110','120'};
 dat = [];
 group = [];
 
@@ -89,5 +90,8 @@ figure;
 boxplot(dat,group);
 xlabel('treadmill speed [%PWS]');
 ylabel('trend correlation coefficient');
-set(gca,'XTickLabel',{'80','90','100','110','120'});
-
+set(gca,'XTickLabel',speeds,'FontWeight','bold','FontSize', 13);
+grid on;
+set(gcf, 'PaperPositionMode', 'auto');
+set(findobj(gca,'type','line'),'linew',1.5);
+hold off; 

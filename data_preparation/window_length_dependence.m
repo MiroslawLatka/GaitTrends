@@ -48,7 +48,7 @@
 clc, clear, close all
 
 % 1 - 100, 2 - 110, 3 - 90, 4 - 120, 5 - 80 [%PWS]
-fileName = 'Ln_SPD1.mat';
+fileName = 'SL_SPD1.mat';
 saveResults = true;
 
 addpath('../data/mat_data');
@@ -144,5 +144,9 @@ for col = 1 : 4 % 1 - alpha1, 2 - alpha2, 3 - alpha3
     title(labels{col});
     xlabel('window length');
     ylabel('scaling exponent');
+    grid on;
+    set(gca,'FontWeight','bold','FontSize', 13);
+    set(gcf, 'PaperPositionMode', 'auto');
+    set(findobj(gca,'type','line'),'linew',1.5);
 
 end

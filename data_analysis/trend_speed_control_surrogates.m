@@ -45,7 +45,7 @@ COV_ST = {};
 COV_SS = {};
 speed_control = {};
 
-for i = 1 : 5 % 1-5 SPD
+for i = 1 : 5
     
 	COV_trend_speed_vec = [];
 	COV_SL_vec = [];

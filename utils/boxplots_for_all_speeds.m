@@ -49,8 +49,11 @@ boxplot(dat,group);
 xlabel('treadmill speed [%PWS]');
 ylabel(ylabel_str);
 title(title_str);
-set(gca,'XTickLabel',speeds);
-
+set(gca,'XTickLabel',speeds,'FontWeight','bold','FontSize', 13);
+grid on;
+set(gcf, 'PaperPositionMode', 'auto');
+set(findobj(gca,'type','line'),'linew',1.5);
+hold off; 
 
 end
 

@@ -136,6 +136,10 @@ for col = 1:4 % 1 - alpha1, 2 - alpha2, 3 - alpha3
     title(labels{col});
     xlabel('window length');
     ylabel('scaling exponent');
+    grid on;
+    set(gca,'FontWeight','bold','FontSize', 13);
+    set(gcf, 'PaperPositionMode', 'auto');
+    set(findobj(gca,'type','line'),'linew',1.5);
 
 end
 

@@ -29,6 +29,7 @@
 clc, clear, close all
 
 addpath('../data/mat_data/');
+addpath('../utils/');
 
 COV_trend_speed_cell = {};
 COV_SL = {};
@@ -36,14 +37,14 @@ COV_ST = {};
 COV_SS = {};
 speed_control = {};
 
-for i = 1 : 5 % 1-5 SPD
+for i = 1 : 5
     
 	% load SL data
-	SLdata = load(strcat('Ln_SPD',num2str(i),'.mat'));
+	SLdata = load(strcat('SL_SPD',num2str(i),'.mat'));
 	% load SL data
-	STdata = load(strcat('Tn_SPD',num2str(i),'.mat'));
+	STdata = load(strcat('ST_SPD',num2str(i),'.mat'));
 	% load SL data
-	SSdata = load(strcat('Sn_SPD',num2str(i),'.mat'));
+	SSdata = load(strcat('SS_SPD',num2str(i),'.mat'));
 
 	trialSize = size(SLdata.residualsAll);
 	COV_trend_speed_vec = [];

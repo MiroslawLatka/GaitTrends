@@ -32,6 +32,7 @@ clc, clear, close all
 cross_correlated = true;
 
 addpath('../data/surrogates/');
+
 corr_cell = {};
 
 for i = 1 : 5
@@ -92,6 +93,7 @@ end % end speed loop
 
 % visualize results for trends
 ind = [5, 3, 1, 2, 4];
+speeds = {'80','90','100','110','120'};
 dat = [];
 group = [];
 
@@ -104,5 +106,8 @@ boxplot(dat,group);
 xlabel('treadmill speed [%PWS]');
 ylabel('trend correlation coefficient');
 title(strcat(ver,' surrogates'));
-set(gca,'XTickLabel',{'80','90','100','110','120'});
-
+set(gca,'XTickLabel',speeds,'FontWeight','bold','FontSize', 13);
+grid on;
+set(gcf, 'PaperPositionMode', 'auto');
+set(findobj(gca,'type','line'),'linew',1.5);
+hold off; 
