@@ -5,7 +5,7 @@
 % ../data/surrogates/surrogates_trend_distributions/ folder. These input
 % files must be created first by running ../data_preparation/multiple_surrogates.m
 % The number of cases in which distributions are not statistically
-% different are printed in the Matlab's command window.
+% different is printed in the Matlab's command window.
 % =========================================================================
 %
 % GaitTrends: 

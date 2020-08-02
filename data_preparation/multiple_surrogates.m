@@ -2,8 +2,8 @@
 % This script loads gait data from Dingwell’s MAT-files and calculates 
 % multiple phase-randomized surrogates using TISEAN library. Then it finds 
 % piecewise linear MARS trends in surrogate time series. For a given 
-% treadmill speed, normalized trend durations and normalized trend slopes
-% in surrogate data are saved to
+% treadmill speed, the normalized trend durations and normalized trend slopes
+% are saved to
 % '../data/surrogates/surrogates_trend_distributions' folder.
 % Before running the script,  please set:
 %       1) speed (SPD)
