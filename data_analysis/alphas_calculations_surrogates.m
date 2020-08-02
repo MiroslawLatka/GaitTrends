@@ -108,16 +108,16 @@ end % end speed loop
 
 % SL madogram
 boxplots_for_all_speeds(alphasSL_cell, strcat(ver,' surrogates'),...
-    '{\alpha}^(^M^D^ for SL');
+    '{\alpha}^(^M^D^) for SL');
 
 
 % ST madogram
 boxplots_for_all_speeds(alphasST_cell, strcat(ver,' surrogates'),...
-    '{\alpha}^(^M^D^ for ST');
+    '{\alpha}^(^M^D^) for ST');
 
 % SS madogram
 boxplots_for_all_speeds(alphasSS_cell, strcat(ver,' surrogates'),...
-    '{\alpha}^(^M^D^ for SS');
+    '{\alpha}^(^M^D^) for SS');
 
 
 % checking if exponents mean/median < 0.5

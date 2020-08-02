@@ -80,123 +80,44 @@ params = aresparams2('useMinSpan',-1,'useEndSpan',-1,'cubic',false,...
 
 for i = 1 : s(2)
 		
-		% raw series
-		orgST = STdata.seriesAll{i};
-		orgSL = SLdata.seriesAll{i};
-		T = STdata.timestampsAll{i};
+    % raw series
+	orgST = STdata.seriesAll{i};
+	orgSL = SLdata.seriesAll{i};
+	T = STdata.timestampsAll{i};
 		
-		% shuffled surrogates
-        surST =  orgST(randperm(length(orgST)));
-		surSL =  orgSL(randperm(length(orgSL)));
+	% shuffled surrogates
+    surST =  orgST(randperm(length(orgST)));
+	surSL =  orgSL(randperm(length(orgSL)));
 		
-		surrogatesST{end+1} = surST;
-		surrogatesSL{end+1} = surSL;
+	surrogatesST{end+1} = surST;
+	surrogatesSL{end+1} = surSL;
         
-		% MARS for SL       
-		X = T(1:length(surSL));
-		Y = surSL; 
-        % build MARS model using ARESLab
-		model = aresbuild(X,Y,params);
-        % calculate trends
-		predSL = arespredict(model,X);
-        % calculate MARS residuals
-		detrendedSL = Y - predSL;
-		
-		surrogatesSL_trends{end+1} = predSL;
-        surrogatesSL_residualsAll{end+1} = detrendedSL;
-		modelsSL{end+1} = model;
-		infosSL{end+1} = SLdata.infosAll{i};
-		timestampsSL{end+1} = {X};
-		
-		% find MARS knots
-        knotSites = sort(cell2mat(model.knotsites));
-		knotIndices = zeros(1,length(knotSites));
-		
-		for k = 1 : length(knotSites)
-			for j = 1 : length(X)
-				if (knotSites(k) == X(j))
-					knotIndices(k) = j;
-					break;
-				 end
-			end
+    % perform calculations for SL surrogates
+    plotTitle = strcat('Y',num2str(i),{'SPD'}, num2str(SPD));
+    outputData = perform_MARS(T(1:length(surSL)),surSL,...
+    	generateFigures,plotTitle,'shuffled SL',params);
 
-		end
-		
-		valuesAtKnot = [];
-		
-		if(knotSites > 0)
-			knotIndices = [1 knotIndices];
-			knotSites = [1; knotSites];
-			valuesAtKnot = predSL(knotIndices);
-		end
-		
-		knotIndicesSL{end+1} = knotIndices;
-		valuesAtKnotSL{end+1} = valuesAtKnot;
-		 
-        % MARS for ST 
-		X = T(1:length(surST));
-		Y = surST; 
-        % build MARS model using ARESLab
-		model = aresbuild(X,Y,params);
-        % calculate trends
-		predST = arespredict(model,X);
-		% calculate residuals (noise)
-		detrendedST = Y - predST;
-		
-        surrogatesST_trends{end+1} = predST;
-		surrogatesST_residualsAll{end+1} = detrendedST;
-		modelsST{end+1} = model;
-		infosST{end+1} = STdata.infosAll{i};
-		timestampsST{end+1} = {X};
+    surrogatesSL_residualsAll{end+1} = outputData.residuals;
+    surrogatesSL_trends{end+1} = outputData.trends;
+    timestampsSL{end+1} = outputData.timestamps;
+    modelsSL{end+1} = outputData.model;
+    infosSL{end+1} = outputData.info;    
+    knotIndicesSL{end+1} = outputData.knotIndices;
+    valuesAtKnotSL{end+1} = outputData.valuesAtKnot;
 
-		% find MARS knots
-        knotSites = sort(cell2mat(model.knotsites));
-		knotIndices = zeros(1,length(knotSites));
-		
-		for k = 1 : length(knotSites)
-			for j = 1 : length(X)
-				if (knotSites(k) == X(j))
-					knotIndices(k) = j;
-					break;
-				 end
-			end
+    % perform calculations for ST surrogates
+    plotTitle = strcat('Y',num2str(i),{'SPD'}, num2str(SPD));
+    outputData = perform_MARS(T(1:length(surST)),surST,...
+        generateFigures,plotTitle,'shuffled ST',params);
 
-		end
-		
-		valuesAtKnot = [];
-		
-		if(knotSites > 0)
-			knotIndices = [1 knotIndices];
-			knotSites = [1; knotSites];
-			valuesAtKnot = predST(knotIndices);
-		end
-		
-		knotIndicesST{end+1} = knotIndices;
-		valuesAtKnotST{end+1} = valuesAtKnot;
-		
-		if(generateFigures)
-			figure;
-            plot(surSL,'b--','LineWidth',1); hold on;
-            plot(surST,'r--','LineWidth',1);
-            plot(predSL,'b','LineWidth',1.5);
-            plot(predST,'r','LineWidth',1.5);
-            xlim([0 length(surSL)]);
-            plot(knotIndicesSL{end}, ...
-                surrogatesSL_trends{end}(knotIndicesSL{end}),'go',...
-                'MarkerSize',8,'LineWidth',2);
-            plot(knotIndicesST{end}, ...
-                surrogatesST_trends{end}(knotIndicesST{end}),'gd',...
-                'MarkerSize',8,'LineWidth',2);
-			title('surrogate data');
-            legend('SL surrogate', 'ST surrogate', 'SL trend', ...
-            'ST trend','SL knot', 'ST knot');      
-            xlabel('time [s]','FontSize', 18);
-            grid on;
-            set(gca,'FontWeight','bold','FontSize', 13);
-            set(gcf, 'PaperPositionMode', 'auto');
-            hold off; 
-		end
-  
+    surrogatesST_residualsAll{end+1} = outputData.residuals;
+    surrogatesST_trends{end+1} = outputData.trends;
+    timestampsST{end+1} = outputData.timestamps;
+    modelsST{end+1} = outputData.model;
+    infosST{end+1} = outputData.info;    
+    knotIndicesST{end+1} = outputData.knotIndices;
+    valuesAtKnotST{end+1} = outputData.valuesAtKnot;
+
 end
 
 % prepare data for saving

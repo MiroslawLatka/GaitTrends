@@ -106,70 +106,22 @@ for i = 1 : length(fileList)
     
     % perform calculations for trial 1
     if length(data1(:,1)) > 1
+        
+        plotTitle = strcat('Y',num2str(i),{'SPD'}, num2str(SPD), ...
+            {'trial'}, strTrial);
+        outputData = perform_MARS(cumsum(data1(:,2))-data1(1,2),...
+            data1(:,attributeNumber),...
+            generateFigures,plotTitle,param,params);
 
-        % cumulate ST to obtain time stamps
-        X = cumsum(data1(:,2))-data1(1,2);
-        Y = data1(:,attributeNumber);
-
-        % build MARS model using ARESLab
-        model = aresbuild(X,Y,params);
-        % calculate trends
-        predY = arespredict(model,X);
-        % calculate MARS residuals
-        detrendedY = Y - predY;
-
-        residualsAll{end+1} = detrendedY;
-        trendsAll{end+1} = predY;
-        seriesAll{end+1} = Y;
-        timestampsAll{end+1} = X;
-        modelsAll{end+1} = model;
-        infosAll{end+1} = strcat(fileList(i).name,'/trial',strTrial);
-
-        % find MARS knots
-        knotSites = sort(cell2mat(model.knotsites));
-        knotIndices = zeros(1,length(knotSites));
-
-        for k = 1 : length(knotSites)
-            for j = 1 : length(X)
-                if (knotSites(k) == X(j))
-					knotIndices(k) = j;
-					break;
-                 end
-            end
-
-        end
-
-        valuesAtKnot = [];
-
-        if(knotSites > 0)
-            knotIndices = [1 knotIndices];
-            knotSites = [1; knotSites];
-            valuesAtKnot = predY(knotIndices);
-        end
-
-        knotIndicesAll{end+1} = knotIndices;
-        valuesAtKnotAll{end+1} = valuesAtKnot;
-
-
-        if(generateFigures)
-			plotTitle = strcat('Y',num2str(i),{'SPD'}, num2str(SPD), ...
-				{'trial'}, strTrial);
-			fig = figure;
-			plot(X,Y,'LineWidth',2); hold on;
-			plot(X,predY,'r','LineWidth',2); 
-			plot(X(knotIndices), predY(knotIndices),'go',...
-                'MarkerSize',8,'LineWidth',2);
-            legend(param,strcat(param,' trend'),'knot');
-			title(plotTitle,'FontSize', 20);
-			xlim([min(X) max(X)]);
-			xlabel('time [s]','FontSize', 18);
-			ylabel(param,'FontSize', 18);
-			grid on;
-			set(gca,'FontWeight','bold','FontSize', 13);
-			set(gcf, 'PaperPositionMode', 'auto');
-			hold off;    
-        end
-
+        residualsAll{end+1} = outputData.residuals;
+        trendsAll{end+1} = outputData.trends;
+        seriesAll{end+1} = outputData.series;
+        timestampsAll{end+1} = outputData.timestamps;
+        modelsAll{end+1} = outputData.model;
+        infosAll{end+1} = outputData.info;    
+        knotIndicesAll{end+1} = outputData.knotIndices;
+        valuesAtKnotAll{end+1} = outputData.valuesAtKnot;
+        
     end
         
     % trial 2
@@ -178,67 +130,20 @@ for i = 1 : length(fileList)
     % perform calculations for trial 2
 	if length(data2(:,1)) > 1
 
-        % cumulate ST to obtain time stamps
-		X = cumsum(data2(:,2))-data2(1,2);
-		Y = data2(:,attributeNumber);
-		
-		% build MARS model using ARESLab
-        model = aresbuild(X,Y,params);
-        % calculate MARS trends
-        predY = arespredict(model,X);
-        % calculate MARS residuals 
-		detrendedY = Y - predY;
-		
-		residualsAll{end+1} = detrendedY;
-		trendsAll{end+1} = predY;
-		seriesAll{end+1} = Y;
-		timestampsAll{end+1} = X;
-		modelsAll{end+1} = model;
-		infosAll{end+1} = strcat(fileList(i).name,'/trial',strTrial);
-		
-		% find MARS knots
-        knotSites = sort(cell2mat(model.knotsites));
-		knotIndices = zeros(1,length(knotSites));
-		
-		for k = 1 : length(knotSites)
-			for j = 1 : length(X)
-				if (knotSites(k) == X(j))
-					knotIndices(k) = j;
-					break;
-				 end
-			end
+        plotTitle = strcat('Y',num2str(i),{'SPD'}, num2str(SPD), ...
+            {'trial'}, strTrial);
+        outputData = perform_MARS(cumsum(data2(:,2))-data2(1,2),...
+            data2(:,attributeNumber),...
+            generateFigures,plotTitle,param,params);
 
-		end
-		
-		valuesAtKnot = [];
-        
-		if(knotSites > 0)
-			knotIndices = [1 knotIndices];
-			knotSites = [1; knotSites];
-			valuesAtKnot = predY(knotIndices);
-		end
-		
-		knotIndicesAll{end+1} = knotIndices;
-		valuesAtKnotAll{end+1} = valuesAtKnot;
-		
-		if(generateFigures)
-			plotTitle = strcat('Y',num2str(i),{'SPD'}, num2str(SPD), ...
-				{'trial'}, strTrial);
-			fig = figure;
-			plot(X,Y,'LineWidth',2); hold on;
-			plot(X,predY,'r','LineWidth',2); 
-			plot(X(knotIndices), predY(knotIndices),'go',...
-                'MarkerSize',8,'LineWidth',2);
-            legend(param,strcat(param,' trend'),'knot');
-			title(plotTitle,'FontSize', 20);
-			xlim([min(X) max(X)]);
-			xlabel('time [s]','FontSize', 18);
-			ylabel(param,'FontSize', 18);
-			grid on;
-			set(gca,'FontWeight','bold','FontSize', 13);
-			set(gcf, 'PaperPositionMode', 'auto');
-			hold off;    
-        end  
+        residualsAll{end+1} = outputData.residuals;
+        trendsAll{end+1} = outputData.trends;
+        seriesAll{end+1} = outputData.series;
+        timestampsAll{end+1} = outputData.timestamps;
+        modelsAll{end+1} = outputData.model;
+        infosAll{end+1} = outputData.info;    
+        knotIndicesAll{end+1} = outputData.knotIndices;
+        valuesAtKnotAll{end+1} = outputData.valuesAtKnot;
 
 	end
 
