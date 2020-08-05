@@ -8,7 +8,7 @@
 % Before running the script,  please set:
 %       1) speed (SPD)
 %       2) number of surrogates for each experimental time series (repetitions)
-%       3) type of surrogates (cross-correlated true, independent = false)
+%       3) type of surrogates (cross-correlated true, independent = false).
 %
 % This script uses surrogates.exe file from TISEAN library.
 % Two text auxiliary files: in.txt and out.txt are used 
@@ -39,10 +39,10 @@
 
 
 clc, clear, close all
-
+tic
 SPD = 1; % 1 - 100, 2 - 110, 3 - 90, 4 - 120, 5 - 80 [%PWS]
-repetitions = 20; % number of surrogates for each experimental time series
-cross_correlated = true;
+repetitions = 50; % number of surrogates for each experimental time series
+cross_correlated = false;
 
 currentPath = pwd;
 addpath('../libs/');
@@ -61,7 +61,6 @@ for x = 1 : repetitions
     trend_slopes_statsST{x} = [];
 end
 
-
 % MARS params
 params = aresparams2('useMinSpan',-1,'useEndSpan',-1,'cubic',false,...
     'c',2,'threshold',1e-3,'maxFuncs',50);
@@ -73,7 +72,16 @@ STdata = load(strcat('ST_SPD',num2str(SPD),'.mat'));
     
 s = size(SLdata.residualsAll);
 
-for r = 1 : repetitions
+if(cross_correlated) % correlated surrogates
+    str = 'cross_correlated_surrogates';
+else
+    str = 'independent_surrogates'; 
+end
+
+all_surrogatesSL = {};
+all_surrogatesST = {};
+
+parfor r = 1 : repetitions
         
     surrogatesSL = {};
     surrogatesST = {};
@@ -91,10 +99,10 @@ for r = 1 : repetitions
     knotIndicesSL = {};
     valuesAtKnotSL = {};
     valuesAtKnotST = {};
-    
+
     
     for i = 1 : s(2)
-
+        
         orgST = STdata.seriesAll{i};
         orgSL = SLdata.seriesAll{i};
         T = STdata.timestampsAll{i};
@@ -103,19 +111,18 @@ for r = 1 : repetitions
         seeds = randi([1 30000],2,1);
          
         if(cross_correlated) % correlated surrogates
-       
-            str = 'cross_correlated_surrogates';
 
             tot = [orgSL  orgST]; 
-            inFile = strcat(pwd, '\in.txt');
-            save(inFile,'tot','-ascii');
-            cmd = strcat('surrogates.exe -o',{' '},pwd, ...
-                        '\out.txt -m 2 -I',{' '},num2str(seeds(1)),{' '},...
-                        pwd,'\in.txt');
+            inFile = strcat(pwd, '\in',num2str(r),'.txt');
+            outFile = strcat(pwd, '\out',num2str(r),'.txt');
+            parsave(inFile,tot);     
+            cmd = strcat('surrogates.exe -o',{' '},outFile, ...
+                        ' -m 2 -I',{' '},num2str(seeds(1)),{' '},...
+                        pwd,'\in',num2str(r),'.txt');
              cd('../libs/');
              system(cmd{1});
              cd(currentPath)
-             surrogatesTot = load('out.txt');
+             surrogatesTot = load(strcat('out',num2str(r),'.txt'));
 
              surSL = surrogatesTot(:,1);
              surST = surrogatesTot(:,2);
@@ -123,37 +130,40 @@ for r = 1 : repetitions
              surrogatesSL{end+1} = surSL;
              surrogatesST{end+1} = surST;
              
+             
         else % independent surrogates
-            
-            str = 'independent_surrogates';       
+                
         
-            inFile = strcat(pwd, '\in.txt');
-            save(inFile,'orgSL','-ascii');
-            cmd = strcat('surrogates.exe -o',{' '},pwd, ...
-                '\out.txt -I',{' '},num2str(seeds(1)),{' '},pwd,'\in.txt');
+            inFile = strcat(pwd, '\in',num2str(r),'.txt');
+            outFile = strcat(pwd, '\out',num2str(r),'.txt');
+            parsave(inFile,orgSL);
+            cmd = strcat('surrogates.exe -o',{' '},outFile, ...
+                        ' -I',{' '},num2str(seeds(1)),{' '},...
+                        pwd,'\in',num2str(r),'.txt');
             cd('../libs/');
             system(cmd{1});
             cd(currentPath)
-            surSL = load('out.txt'); 
+            surSL = load(strcat('out',num2str(r),'.txt')); 
             surrogatesSL{end+1} = surSL;
 
-            inFile = strcat(pwd, '\in.txt');
-            save(inFile,'orgST','-ascii');
-            cmd = strcat('surrogates.exe -o',{' '},pwd, ...
-                '\out.txt -I',{' '},num2str(seeds(2)),{' '},pwd,'\in.txt');
+            inFile = strcat(pwd, '\in',num2str(r),'.txt');
+            outFile = strcat(pwd, '\out',num2str(r),'.txt');
+            parsave(inFile,orgST);
+            cmd = strcat('surrogates.exe -o',{' '},outFile, ...
+                ' -I',{' '},num2str(seeds(2)),{' '},...
+                pwd,'\in',num2str(r),'.txt');
             cd('../libs/');
             system(cmd{1});
             cd(currentPath)
-            surST = load('out.txt');
-            surrogatesST{end+1} = surST;		
-         
-        end % end if
+            surST = load(strcat('out',num2str(r),'.txt')); 
+            surrogatesST{end+1} = surST;
             
+        end % end if
+                
         % SL surrogates 
          outputData = perform_MARS(T(1:length(surSL)),...
             surSL,false,[],[],params);
         
-
         surrogatesSL_residualsAll{end+1} = outputData.residuals;
         surrogatesSL_trends{end+1} = outputData.trends;
         timestampsSL{end+1} = outputData.timestamps;
@@ -162,20 +172,15 @@ for r = 1 : repetitions
         knotIndicesSL{end+1} = outputData.knotIndices;
         valuesAtKnotSL{end+1} = outputData.valuesAtKnot;
         
-        data_surrogatesSL.trendsAll = surrogatesSL_trends;
-        data_surrogatesSL.seriesAll = surrogatesSL;
-        data_surrogatesSL.timestampsAll = timestampsSL;
-        data_surrogatesSL.residualsAll = surrogatesSL_residualsAll;
-        data_surrogatesSL.modelsAll = modelsSL;
-        data_surrogatesSL.infosAll = infosSL;
-        data_surrogatesSL.knotIndicesAll = knotIndicesSL;
-        data_surrogatesSL.valuesAtKnotAll = valuesAtKnotSL;
-
-    
-        % ST surrogates
-        outputData = perform_MARS(T(1:length(surSL)),...
+        [trend_durationsSL, trend_slopesSL] = par_trend_stats...
+            (surrogatesSL,surrogatesSL_trends,timestampsSL,...
+             surrogatesSL_residualsAll,modelsSL,infosSL,knotIndicesSL,...
+             valuesAtKnotSL);
+         
+%         % ST surrogates
+        outputData = perform_MARS(T(1:length(surST)),...
             surST,false,[],[],params);
-
+        
         surrogatesST_residualsAll{end+1} = outputData.residuals;
         surrogatesST_trends{end+1} = outputData.trends;
         timestampsST{end+1} = outputData.timestamps;
@@ -183,24 +188,13 @@ for r = 1 : repetitions
         infosST{end+1} = outputData.info;    
         knotIndicesST{end+1} = outputData.knotIndices;
         valuesAtKnotST{end+1} = outputData.valuesAtKnot;
+        
+         [trend_durationsST, trend_slopesST] = par_trend_stats...
+            (surrogatesST,surrogatesST_trends,timestampsST,...
+             surrogatesST_residualsAll,modelsST,infosST,knotIndicesST,...
+             valuesAtKnotST);
 
-        data_surrogatesST.trendsAll = surrogatesST_trends;
-        data_surrogatesST.seriesAll = surrogatesST;
-        data_surrogatesST.timestampsAll = timestampsST;
-        data_surrogatesST.residualsAll = surrogatesST_residualsAll;
-        data_surrogatesST.modelsAll = modelsST;
-        data_surrogatesST.infosAll = infosST;
-        data_surrogatesST.knotIndicesAll = knotIndicesST;
-        data_surrogatesST.valuesAtKnotAll = valuesAtKnotST;
-    
-    
-         % trend stats
-        [trend_durationsSL, trend_slopesSL, ~, ~] = ...
-            calculate_trend_stats(data_surrogatesSL);
 
-        [trend_durationsST, trend_slopesST, ~, ~] = ...
-            calculate_trend_stats(data_surrogatesST);
-     
      end % end trial loop
      
      trend_durations_statsSL{r} = [trend_durations_statsSL{r}; ...
@@ -216,6 +210,17 @@ for r = 1 : repetitions
      
 end % end repetitions loop    
 
+% delete unnecessary text files
+inFileStruct = dir('in*');
+outFileStruct = dir('out*');
+
+for d = 1 : length(inFileStruct)
+    fni = inFileStruct(d).name;
+    delete(sprintf('%s',fni));
+    fno = outFileStruct(d).name;
+    delete(sprintf('%s',fno));
+end
+
 % save data 
 file = strcat('../data/surrogates/surrogates_trend_distributions/distr_',...
               str,'_SPD',num2str(SPD),'.mat');
@@ -224,3 +229,38 @@ save(file,'trend_durations_statsSL','trend_durations_statsST',...
     'trend_slopes_statsSL','trend_slopes_statsST');
   
 disp(strcat('Data saved to: ',file));
+toc
+
+% local functions
+
+% local function used to calculate trend durations and slopes in parfor loop
+function [trend_durations, trend_slopes] = par_trend_stats(series,...
+    trends,timestamps,residuals,models,infos,knotIndices,valuesAtKnot)
+
+data_struct.trendsAll = trends;
+data_struct.seriesAll = series;
+data_struct.timestampsAll = timestamps;
+data_struct.residualsAll = residuals;
+data_struct.modelsAll = models;
+data_struct.infosAll = infos;
+data_struct.knotIndicesAll = knotIndices;
+data_struct.valuesAtKnotAll = valuesAtKnot;
+
+% trend stats
+[trend_durations, trend_slopes, ~, ~] = ...
+    calculate_trend_stats(data_struct);
+
+end
+
+% local function used to save text files in parfor loop
+function parsave(fname,data)
+
+data_str = getVarName(data);
+save(fname, data_str, '-ascii');
+
+end
+
+% local function used to get variable name as a string
+function out = getVarName(var)
+    out = inputname(1);
+end

@@ -4,8 +4,14 @@
 % their phase-randomized surrogates. The script uses MAT-files located in 
 % ../data/surrogates/surrogates_trend_distributions/ folder. These input
 % files must be created first by running ../data_preparation/multiple_surrogates.m
+% Before running the script,  please choose:
+%       1) type of surrogates (cross-correlated = true, independent = false)
+%       2) whether you want to analyze trend durations (param=1) or trend
+%          slopes (param=2).
+% The value of repetitions variable  may not be greater than 
+% the number of surrogates created by the multiple_surrogates.m script.
 % The number of cases in which distributions are not statistically
-% different is printed in the Matlab's command window.
+% different is printed in the MATLAB's command window.
 % =========================================================================
 %
 % GaitTrends: 
@@ -30,14 +36,19 @@
 clc, clear, close all
 
 cross_correlated = false;
+param = 1; % 1 - trend durations, 2 - trend slopes
 
 % make sure that the value of repetitions variable  is not greater than 
 % the number of surrogates created by the multiple_surrogates.m script.
-repetitions = 20;
+repetitions = 50;
 
 
 addpath('../data/surrogates/surrogates_trend_distributions/');
 addpath('../data/trend_stats/');
+
+if(~(param == 1 || param == 2))
+    error('Error. param must be 1 or 2.')
+end
 
 all_trend_statsSL = cell(repetitions,0);
 all_trend_statsST = cell(repetitions,0);
@@ -68,11 +79,19 @@ for i = 1 : s(2)
     data = load(fileNamesCell{i}); 
 
 	for r = 1 : repetitions	
-		all_trend_statsSL{r} = [all_trend_statsSL{r};  ...
-            data.trend_durations_statsSL{r}];
-		all_trend_statsST{r} = [all_trend_statsST{r}; ...
-            data.trend_durations_statsST{r}]; 
-	end
+        
+        if(param == 1)
+            all_trend_statsSL{r} = [all_trend_statsSL{r};  ...
+                data.trend_durations_statsSL{r}];
+            all_trend_statsST{r} = [all_trend_statsST{r}; ...
+                data.trend_durations_statsST{r}]; 
+        else
+            all_trend_statsSL{r} = [all_trend_statsSL{r};  ...
+                data.trend_slopes_statsSL{r}];
+            all_trend_statsST{r} = [all_trend_statsST{r}; ...
+                data.trend_slopes_statsST{r}]; 
+        end
+    end
 	
 end
 
@@ -85,10 +104,14 @@ orgST = [];
 
 % aggregate experimental data
 for l = 1 : length(SL_trends_Org.trend_durations_cell)
-    orgSL = [orgSL; SL_trends_Org.trend_durations_cell{l}];
-    orgST = [orgST; ST_trends_Org.trend_durations_cell{l}];
+    if(param == 1) 
+        orgSL = [orgSL; SL_trends_Org.trend_durations_cell{l}];
+        orgST = [orgST; ST_trends_Org.trend_durations_cell{l}];
+    else
+        orgSL = [orgSL; SL_trends_Org.trend_slopes_cell{l}];
+        orgST = [orgST; ST_trends_Org.trend_slopes_cell{l}];
+    end
 end
-
 
 countSL = 0;
 countST = 0;

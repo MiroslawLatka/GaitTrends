@@ -43,7 +43,7 @@
 
 clc, clear, close all
 
-surrogates_type = 1; % 1 - independent, 2 - cross-correlated, 3 - shuffled
+surrogates_type = 3; % 1 - independent, 2 - cross-correlated, 3 - shuffled
 
 addpath('../utils/');
 
