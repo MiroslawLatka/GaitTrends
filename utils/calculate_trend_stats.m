@@ -43,7 +43,11 @@ function [trend_durations, trend_slopes, long_trend_durations, long_trend_slopes
 % =========================================================================
 
 % Citing the GaitTrends:
-% https://doi.org/10.1101/677948
+% https://doi.org/10.1371/journal.pcbi.1007180
+
+
+% =========================================================================
+
 
 trialSize = size(data.residualsAll);
 trend_durations = [];
